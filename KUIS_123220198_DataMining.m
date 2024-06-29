@@ -22,7 +22,7 @@ function varargout = KUIS_123220198_DataMining(varargin)
 
 % Edit the above text to modify the response to help KUIS_123220198_DataMining
 
-% Last Modified by GUIDE v2.5 29-Jun-2024 09:30:06
+% Last Modified by GUIDE v2.5 29-Jun-2024 09:45:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -78,7 +78,11 @@ function tampilButton_Callback(hObject, eventdata, handles)
 % hObject    handle to tampilButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+opts = detectImportOptions('milk.csv');
+opts.SelectedVariableNames = (1:8);
+data = readtable('milk.csv',opts);
+data = table2cell(data);
+set(handles.tabelData, 'Data', data);
 
 
 
@@ -270,6 +274,17 @@ function resetButton_Callback(hObject, eventdata, handles)
 % hObject    handle to resetButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+set(handles.inpH, 'String', '');
+set(handles.inTemp, 'String', '');
+set(handles.inTaste, 'String', '');
+set(handles.inOdor, 'String', '');
+set(handles.inFat, 'String', '');
+set(handles.inTurb, 'String', '');
+set(handles.inColour, 'String', '');
+set(handles.inK, 'String', '');
+set(handles.teksHasil, 'String', '');
+set(handles.tabelData, 'Data', {});
+
 
 
 % --- Executes on button press in prosesButton.
@@ -277,3 +292,27 @@ function prosesButton_Callback(hObject, eventdata, handles)
 % hObject    handle to prosesButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+inpH = str2double(get(handles.inpH, 'String'));
+inTemp = str2double(get(handles.inTemp, 'String'));
+inTaste = str2double(get(handles.inTaste, 'String'));
+inOdor = str2double(get(handles.inOdor, 'String'));
+inFat = str2double(get(handles.inFat, 'String'));
+inTurb = str2double(get(handles.inTurb, 'String'));
+inColour = str2double(get(handles.inColour, 'String'));
+inK = str2double(get(handles.inK, 'String'));
+
+sample = [inpH inTemp inTaste inOdor inFat inTurb inColour];
+
+opts = detectImportOptions('milk.csv');
+opts.SelectedVariableNames=(1:7);
+training = readmatrix('milk.csv',opts);
+
+opts = detectImportOptions('milk.csv');
+opts.SelectedVariableNames = 8;
+group = readmatrix('milk.csv',opts);
+
+
+class = fitcknn(training, group, 'NumNeighbors',inK);
+klasifikasi = predict(class,sample);
+
+set(handles.teksHasil, 'String',klasifikasi);
